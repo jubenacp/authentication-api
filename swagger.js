@@ -27,6 +27,10 @@ const swaggerOptions = {
         bearerAuth: [],
       },
     ],
+    tags:[
+      {name: 'User Account', order: 1},
+      {name: 'Machine Learning Model', order: 2}
+    ]
   },
   apis: ['./routes/*.js'],
 };

@@ -6,10 +6,11 @@ const mlModelController = require('../controllers/mlModelController');
 
 /**
  * @swagger
- * /train:
+ * /api/mlmodel/train:
  *   post:
- *     summary: Entrenar el modelo KNN
- *     description: Este endpoint entrena un modelo KNN usando los datos proporcionados.
+ *     summary: Train KNN model
+ *     tags: [Machine Learning Model]
+ *     description: This endpoint trains a KNN model using the provided data.
  *     requestBody:
  *       required: true
  *       content:
@@ -40,7 +41,7 @@ const mlModelController = require('../controllers/mlModelController');
  *                             type: string
  *     responses:
  *       200:
- *         description: Entrenamiento exitoso
+ *         description: Successful training
  *         content:
  *           application/json:
  *             schema:
@@ -57,18 +58,19 @@ const mlModelController = require('../controllers/mlModelController');
  *                     items:
  *                       type: integer
  *       400:
- *         description: Error en los datos proporcionados
+ *         description: Error in the data provided
  *       500:
- *         description: Error interno del servidor
+ *         description: Internal Server Error
  */
 router.post('/train', upload.single('file'), mlModelController.trainModel);
 
 /**
  * @swagger
- * /predict:
+ * /api/mlmodel/predict:
  *   post:
- *     summary: Realizar predicciones usando el modelo KNN entrenado
- *     description: Este endpoint realiza predicciones basadas en el modelo KNN entrenado.
+ *     summary: Make predictions using the trained KNN model
+ *     tags: [Machine Learning Model]
+ *     description: This endpoint makes predictions based on the trained KNN model.
  *     requestBody:
  *       required: true
  *       content:
@@ -99,7 +101,7 @@ router.post('/train', upload.single('file'), mlModelController.trainModel);
  *                             type: string
  *     responses:
  *       200:
- *         description: Predicción exitosa
+ *         description: Successful prediction
  *         content:
  *           application/json:
  *             schema:
@@ -110,9 +112,9 @@ router.post('/train', upload.single('file'), mlModelController.trainModel);
  *                   items:
  *                     type: number
  *       400:
- *         description: Error en los datos proporcionados
+ *         description: Error in the data provided
  *       500:
- *         description: Error interno del servidor
+ *         description: Internal Server Error
  */
 router.post('/predict', upload.single('file'), mlModelController.predictModel);
 

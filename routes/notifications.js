@@ -6,6 +6,7 @@ const router = express.Router();
  * /api/notifications:
  *   post:
  *     summary: Send notifications to users
+ *     tags: [Notifications]
  *     requestBody:
  *       required: true
  *       content:
@@ -23,7 +24,6 @@ const router = express.Router();
  */
 router.post('/', (req, res) => {
   const { userId, message } = req.body;
-  // Aquí puedes agregar la lógica para enviar notificaciones
   res.json({ msg: 'Notification sent successfully' });
 });
 

@@ -13,7 +13,7 @@ const db = require('../config/database');
  * @swagger
  * /api/user_networks:
  *   get:
- *     summary: Obtener el historial de redes de un usuario
+ *     summary: Get the user's network history
  *     tags: [User Networks]
  *     parameters:
  *       - in: query
@@ -21,10 +21,10 @@ const db = require('../config/database');
  *         schema:
  *           type: integer
  *         required: true
- *         description: ID del usuario
+ *         description: User ID
  *     responses:
  *       200:
- *         description: Historial de redes recuperado exitosamente.
+ *         description: Network history successfully retrieved.
  *         content:
  *           application/json:
  *             schema:
@@ -46,9 +46,9 @@ const db = require('../config/database');
  *                     type: string
  *                     format: date-time
  *       400:
- *         description: Petición inválida.
+ *         description: Invalid request.
  *       500:
- *         description: Error del servidor.
+ *         description: Server error.
  */
 router.get('/', async (req, res) => {
     const { user_id } = req.query;

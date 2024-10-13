@@ -7,7 +7,7 @@ const authController = require('../controllers/authController');
  * /api/auth/register:
  *   post:
  *     summary: Register a new user
- *     tags: [Auth]
+ *     tags: [User Account]
  *     requestBody:
  *       required: true
  *       content:
@@ -41,7 +41,7 @@ router.post('/register', authController.register);
  * /api/auth/login:
  *   post:
  *     summary: Login a user
- *     tags: [Auth]
+ *     tags: [User Account]
  *     requestBody:
  *       required: true
  *       content:
@@ -68,11 +68,12 @@ router.post('/login', authController.login);
  * @swagger
  * /api/auth/update:
  *   put:
- *     summary: Actualizar información del usuario
+ *     summary: Update user information
+ *     tags: [User Account]
  *     parameters:
  *       - in: body
  *         name: user
- *         description: Información del usuario
+ *         description: User Information
  *         schema:
  *           type: object
  *           required:
@@ -91,11 +92,11 @@ router.post('/login', authController.login);
  *               type: string
  *     responses:
  *       200:
- *         description: Información del usuario actualizada exitosamente
+ *         description: User information correctly updated
  *       400:
- *         description: Faltan datos necesarios
+ *         description: Required data missing
  *       500:
- *         description: Error del servidor
+ *         description: Server error
  */
 router.put('/update', async (req, res) => {
     const { user_id, name, email, phone_number } = req.body;

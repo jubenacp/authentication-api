@@ -5,14 +5,13 @@ const db = require('../config/database');
  * @swagger
  * tags:
  *   name: User Devices
- *   description: API for managing user devices
  */
 
 /**
  * @swagger
  * /api/user_devices:
  *   get:
- *     summary: Obtener la lista de dispositivos asociados a un usuario
+ *     summary: Get the list of devices associated with a user
  *     tags: [User Devices]
  *     parameters:
  *       - in: query
@@ -20,10 +19,10 @@ const db = require('../config/database');
  *         schema:
  *           type: integer
  *         required: true
- *         description: ID del usuario
+ *         description: User ID
  *     responses:
  *       200:
- *         description: Lista de dispositivos recuperada exitosamente.
+ *         description: List of devices successfully retrieved.
  *         content:
  *           application/json:
  *             schema:
@@ -47,9 +46,9 @@ const db = require('../config/database');
  *                     type: string
  *                     format: date-time
  *       400:
- *         description: Petición inválida.
+ *         description: Invalid request.
  *       500:
- *         description: Error del servidor.
+ *         description: Server error.
  */
 router.get('/', async (req, res) => {
     const { user_id } = req.query;
@@ -69,7 +68,7 @@ router.get('/', async (req, res) => {
  * @swagger
  * /api/user_devices/{device_id}:
  *   delete:
- *     summary: Eliminar un dispositivo asociado a un usuario
+ *     summary: Delete a device associated with a user
  *     tags: [User Devices]
  *     parameters:
  *       - in: path
@@ -77,14 +76,14 @@ router.get('/', async (req, res) => {
  *         schema:
  *           type: string
  *         required: true
- *         description: ID del dispositivo
+ *         description: Device ID
  *     responses:
  *       200:
- *         description: Dispositivo eliminado exitosamente.
+ *         description: Device successfully deleted.
  *       400:
- *         description: Petición inválida.
+ *         description: Invalid request.
  *       500:
- *         description: Error del servidor.
+ *         description: Server error.
  */
 router.delete('/:device_id', async (req, res) => {
     const { device_id } = req.params;

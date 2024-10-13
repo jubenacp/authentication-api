@@ -6,12 +6,13 @@ const db = require('../config/database');
  * @swagger
  * /api/usage_history:
  *   get:
- *     summary: Obtener el historial de uso
+ *     summary: Get usage history
+ *     tags: [Usage History]
  *     responses:
  *       200:
- *         description: Historial de uso obtenido correctamente
+ *         description: Usage history successfully retrieved
  *       500:
- *         description: Error interno del servidor
+ *         description: Internal server error
  */
 router.get('/', async (req, res) => {
     try {
@@ -27,12 +28,13 @@ router.get('/', async (req, res) => {
  * @swagger
  * /api/usage_history:
  *   delete:
- *     summary: Eliminar registros del historial de uso
+ *     summary: Delete usage history records
+ *     tags: [Usage History]
  *     responses:
  *       200:
- *         description: Historial de uso eliminado correctamente
+ *         description: Usage history successfully deleted
  *       500:
- *         description: Error interno del servidor
+ *         description: Internal server error
  */
 router.delete('/', async (req, res) => {
     try {

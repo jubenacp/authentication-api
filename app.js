@@ -1,3 +1,4 @@
+require('dotenv').config();
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -19,10 +20,10 @@ const usageHistoryRouter = require('./routes/usageHistory');
 const userDevicesRouter = require('./routes/userDevices');
 const userLocationsRouter = require('./routes/userLocations');
 const userNetworksRouter = require('./routes/userNetworks');
-
+const logsRouter = require('./routes/logs');
+const modelVersionsRoutes = require('./routes/modelVersions');
 const mlmodelRoutes = require('./routes/mlmodel');
-
-
+const adminRouter = require('./routes/admin');
 
 const authMiddleware = require('./middleware/authMiddleware');
 const loggingMiddleware = require('./middleware/loggingMiddleware');
@@ -50,9 +51,11 @@ app.use('/api/usage_history', usageHistoryRouter);
 app.use('/api/user_devices', authMiddleware, userDevicesRouter);
 app.use('/api/user_locations', authMiddleware, userLocationsRouter);
 app.use('/api/user_networks', authMiddleware, userNetworksRouter);
-app.use('/mlmodel', mlmodelRoutes);
+app.use('/api/mlmodel', mlmodelRoutes);
+app.use('/api/mlmodel/logs', logsRouter);
+app.use('/api/mlmodel/models', modelVersionsRoutes);
+app.use('/api/admin', adminRouter);
 
-// Ruta para cargar archivo TSV
 app.post('/api/upload', upload.single('file'), (req, res) => {
   const file = req.file;
   if (!file) {
@@ -92,7 +95,6 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   };
 
   tsvToJSON().then(jsonData => {
-    // Adaptar la estructura del JSON según lo requerido por el endpoint /api/mlmodel/predict
     const adaptedData = {
       user_id: parseInt(jsonData[0].user_id),
       session_id: parseInt(jsonData[0].session_id),
@@ -103,7 +105,6 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
       }))
     };
 
-    // Aquí puedes realizar la solicitud a tu endpoint de predicción o devolver el JSON adaptado
     res.json(adaptedData);
   }).catch(err => {
     console.error(err);
