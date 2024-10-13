@@ -32,7 +32,7 @@ const swaggerSetup = require('./swagger');
 
 const app = express();
 
-app.use(cors()); // Asegúrate de que el middleware de CORS esté aquí
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -57,75 +57,79 @@ app.use('/api/mlmodel/models', modelVersionsRoutes);
 app.use('/api/admin', adminRouter);
 
 app.post('/api/upload', upload.single('file'), (req, res) => {
-  const file = req.file;
-  if (!file) {
-    return res.status(400).json({ msg: 'No file uploaded' });
-  }
-
-  const fs = require('fs');
-  const readline = require('readline');
-  const path = require('path');
-  const filePath = path.join(__dirname, file.path);
-
-  const tsvToJSON = async () => {
-    const fileStream = fs.createReadStream(filePath);
-    const rl = readline.createInterface({
-      input: fileStream,
-      crlfDelay: Infinity
-    });
-
-    const jsonResult = [];
-    let headers = [];
-
-    for await (const line of rl) {
-      const columns = line.split('\t');
-      if (!headers.length) {
-        headers = columns;
-      } else {
-        const row = {};
-        columns.forEach((col, index) => {
-          row[headers[index]] = col;
-        });
-        jsonResult.push(row);
-      }
+    const file = req.file;
+    if (!file) {
+        return res.status(400).json({ msg: 'No file uploaded' });
     }
 
-    fs.unlinkSync(filePath); // Eliminar el archivo cargado después de procesarlo
-    return jsonResult;
-  };
+    const fs = require('fs');
+    const readline = require('readline');
+    const path = require('path');
+    const filePath = path.join(__dirname, file.path);
 
-  tsvToJSON().then(jsonData => {
-    const adaptedData = {
-      user_id: parseInt(jsonData[0].user_id),
-      session_id: parseInt(jsonData[0].session_id),
-      usage_history: jsonData.map(event => ({
-        timestamp: event.timestamp,
-        app_name: event.app_name,
-        event_type: event.event_type
-      }))
+    const tsvToJSON = async () => {
+        const fileStream = fs.createReadStream(filePath);
+        const rl = readline.createInterface({
+            input: fileStream,
+            crlfDelay: Infinity
+        });
+
+        const jsonResult = [];
+        let headers = [];
+
+        for await (const line of rl) {
+            const columns = line.split('\t');
+            if (!headers.length) {
+                headers = columns;
+            } else {
+                const row = {};
+                columns.forEach((col, index) => {
+                    row[headers[index]] = col;
+                });
+                jsonResult.push(row);
+            }
+        }
+
+        fs.unlinkSync(filePath); // Eliminar el archivo cargado después de procesarlo
+        return jsonResult;
     };
 
-    res.json(adaptedData);
-  }).catch(err => {
-    console.error(err);
-    res.status(500).json({ msg: 'Error processing file' });
-  });
+    tsvToJSON().then(jsonData => {
+        const adaptedData = {
+            user_id: parseInt(jsonData[0].user_id),
+            session_id: parseInt(jsonData[0].session_id),
+            usage_history: jsonData.map(event => ({
+                timestamp: event.timestamp,
+                app_name: event.app_name,
+                event_type: event.event_type
+            }))
+        };
+
+        res.json(adaptedData);
+    }).catch(err => {
+        console.error(err);
+        res.status(500).json({ msg: 'Error processing file' });
+    });
 });
 
 swaggerSetup(app);
 
 app.use(function(req, res, next) {
-  next(createError(404));
+    next(createError(404));
 });
 
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500).json({
-    message: err.message,
-    error: req.app.get('env') === 'development' ? err : {}
-  });
+    res.status(err.status || 500).json({
+        message: err.message,
+        error: req.app.get('env') === 'development' ? err : {}
+    });
+});
+
+// Configuración del puerto
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
 
 console.log('Aplicación Express configurada correctamente');
 module.exports = app;
-
-
