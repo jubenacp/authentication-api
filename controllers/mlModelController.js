@@ -101,7 +101,7 @@ async function predictModel(req, res) {
 
         res.status(200).json(result);
     } catch (error) {
-        console.error('Error en predictModel:', error); // Esto imprimirá el error completo en la consola
+        console.error('Error en predictModel:', error);
         res.status(500).json({ error: 'Error haciendo predicción.', details: error.message });
     }
 }

@@ -59,11 +59,11 @@ async function trainModel(data, updateModelVersion) {
 
 async function predictModel(data) {
     try {
-        const response = await axios.post(apiPredictionUrl, { data }, {
+        const response = await axios.post(apiPredictionUrl, data, {
             headers: {
                 'Content-Type': 'application/json'
             }
-        });
+        });          
         return response.data;
     } catch (error) {
         console.error('Error haciendo predicción con Flask:', error);
