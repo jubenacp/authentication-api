@@ -16,13 +16,13 @@ exports.getPermissions = (req, res) => {
 };
 
 exports.assignPermission = (req, res) => {
-    const { userId, permissionId } = req.body;
+    const { user_id, permission_id } = req.body;
 
     if (req.user.permission_id !== 1) {
         return res.status(403).json({ msg: 'No tiene permisos para acceder a esta funcionalidad.' });
     }
 
-    db.query('UPDATE users SET permission_id = ? WHERE id = ?', [permissionId, userId], (err, result) => {
+    db.query('UPDATE users SET permission_id = ? WHERE id = ?', [permission_id, user_id], (err, result) => {
         if (err) {
             console.error('Error al asignar el permiso:', err);
             return res.status(500).json({ msg: 'Error en el servidor' });

@@ -42,7 +42,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(loggingMiddleware);
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api/admin/users', usersRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/mlmodel', authMiddleware, mlModelRouter);
