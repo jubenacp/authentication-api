@@ -120,7 +120,56 @@ const modelVersionsController = require('../controllers/modelVersionsController'
  *       500:
  *         description: Server error
  */
+
+/**
+ * @swagger
+ * /api/mlmodel/models/{id}:
+ *   delete:
+ *     summary: Delete model version by ID
+ *     description: Delete a specific model version by providing the version ID.
+ *     tags: [Machine Learning Model]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the model version to delete
+ *     responses:
+ *       200:
+ *         description: Model version deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Confirmation message for successful deletion
+ *       404:
+ *         description: Model version not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message if the model version ID does not exist
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message for server issues
+ */
+
 router.get('/', modelVersionsController.getAllModelVersions);
 router.get('/:id', modelVersionsController.getModelVersionById);
+router.delete('/:id', modelVersionsController.deleteModelVersion);
 
 module.exports = router;

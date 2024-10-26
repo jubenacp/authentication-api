@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware'); // Middleware pa
 
 /**
  * @swagger
- * /api/mlmode/logs:
+ * /api/mlmodel/logs:
  *   get:
  *     summary: Get training sessions logs
  *     description: Retrieve a list of all training sessions (logs). Only users with a valid JWT are authorized to use this endpoint.
