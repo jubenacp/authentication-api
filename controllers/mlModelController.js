@@ -38,9 +38,13 @@ async function trainModel(req, res) {
         let data, trainingDataFile;
         if (req.file) {
             const filePath = path.join(__dirname, '../uploads', req.file.filename);
-            const convertedData = await mlModelService.convertTsvToJson(filePath);
-            data = convertedData.data;
-            trainingDataFile = req.file.originalname;
+            try {
+                const convertedData = await mlModelService.convertTsvToJson(filePath);
+                data = convertedData.data;
+                trainingDataFile = req.file.originalname;
+            } catch (validationError) {
+                return res.status(400).json({ error: validationError.message });
+            }
         } else {
             data = req.body;
             trainingDataFile = 'unknown';

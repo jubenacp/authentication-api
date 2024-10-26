@@ -9,6 +9,28 @@ const apiPredictionUrl = `${process.env.ML_MODEL_URL}/predict`;
 async function convertTsvToJson(filePath) {
     const jsonArray = await csv({ delimiter: '\t' }).fromFile(filePath);
 
+    // Validar que no haya campos vacíos o incorrectos
+    for (const [index, record] of jsonArray.entries()) {
+        if (!record.user_id || isNaN(parseInt(record.user_id, 10))) {
+            throw new Error(`Campo 'user_id' vacío o incorrecto en el registro ${index + 1}`);
+        }
+        if (!record.session_id || isNaN(parseInt(record.session_id, 10))) {
+            throw new Error(`Campo 'session_id' vacío o incorrecto en el registro ${index + 1}`);
+        }
+        if (record.is_authenticated === undefined || isNaN(parseInt(record.is_authenticated, 10))) {
+            throw new Error(`Campo 'is_authenticated' vacío o incorrecto en el registro ${index + 1}`);
+        }
+        if (!record.timestamp || typeof record.timestamp !== 'string') {
+            throw new Error(`Campo 'timestamp' vacío o incorrecto en el registro ${index + 1}`);
+        }
+        if (!record.app_name || typeof record.app_name !== 'string') {
+            throw new Error(`Campo 'app_name' vacío o incorrecto en el registro ${index + 1}`);
+        }
+        if (!record.event_type || typeof record.event_type !== 'string') {
+            throw new Error(`Campo 'event_type' vacío o incorrecto en el registro ${index + 1}`);
+        }
+    }
+
     // Extraer el user_id del primer registro
     let userId = 'unknown';
     if (jsonArray.length > 0 && jsonArray[0].user_id) {
