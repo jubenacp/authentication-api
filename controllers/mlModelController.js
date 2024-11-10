@@ -33,7 +33,7 @@ async function trainModel(req, res) {
         }
 
         const updateModelVersionRaw = req.body.updateModelVersion || req.query.updateModelVersion;
-        const updateModelVersion = updateModelVersionRaw === 'true' || updateModelVersionRaw === true;
+        const updateModelVersion = req.body.updateModelVersion === 'true' || req.body.updateModelVersion === true || false;
 
         let data, trainingDataFile;
         if (req.file) {
@@ -51,7 +51,11 @@ async function trainModel(req, res) {
         }
 
         // Utilizar la URL del modelo desde el archivo .env
-        const result = await mlModelService.trainModel(data, process.env.ML_MODEL_URL, updateModelVersion);
+        const result = await mlModelService.trainModel(data, updateModelVersion);
+
+        if (!updateModelVersion && result.modelVersion) {
+            delete result.modelVersion;
+        }
 
         const trainingSessionData = {
             user_id: userId,
@@ -76,8 +80,12 @@ async function trainModel(req, res) {
 
         // Si updateModelVersion es true, actualizar la tabla model_versions
         if (updateModelVersion) {
+            console.log("Llamando a handleModelVersionUpdate porque updateModelVersion es:", updateModelVersion);
             await handleModelVersionUpdate(result, trainingDataFile);
+        } else {
+            console.log("No se llamará a handleModelVersionUpdate porque updateModelVersion es:", updateModelVersion);
         }
+        
 
         res.status(200).json(result);
 

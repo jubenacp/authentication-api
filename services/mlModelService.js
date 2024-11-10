@@ -17,9 +17,6 @@ async function convertTsvToJson(filePath) {
         if (!record.session_id || isNaN(parseInt(record.session_id, 10))) {
             throw new Error(`Campo 'session_id' vacío o incorrecto en el registro ${index + 1}`);
         }
-        if (record.is_authenticated === undefined || isNaN(parseInt(record.is_authenticated, 10))) {
-            throw new Error(`Campo 'is_authenticated' vacío o incorrecto en el registro ${index + 1}`);
-        }
         if (!record.timestamp || typeof record.timestamp !== 'string') {
             throw new Error(`Campo 'timestamp' vacío o incorrecto en el registro ${index + 1}`);
         }
@@ -40,7 +37,6 @@ async function convertTsvToJson(filePath) {
     const formattedData = jsonArray.map(record => ({
         user_id: parseInt(record.user_id, 10),
         session_id: parseInt(record.session_id, 10),
-        is_authenticated: parseInt(record.is_authenticated, 10),
         usage_history: [
             {
                 timestamp: record.timestamp,
@@ -64,7 +60,7 @@ async function trainModel(data, updateModelVersion) {
     try {
         const requestBody = {
             data: data,
-            updateModelVersion: updateModelVersion
+            updateModelVersion: Boolean(updateModelVersion)
         };
 
         const response = await axios.post(apiTrainUrl, requestBody, {
@@ -85,7 +81,7 @@ async function predictModel(data) {
             headers: {
                 'Content-Type': 'application/json'
             }
-        });          
+        });
         return response.data;
     } catch (error) {
         console.error('Error haciendo predicción con Flask:', error);
