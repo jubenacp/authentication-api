@@ -53,22 +53,24 @@ async function trainModel(req, res) {
         // Utilizar la URL del modelo desde el archivo .env
         const result = await mlModelService.trainModel(data, updateModelVersion);
 
-        if (!updateModelVersion && result.modelVersion) {
-            delete result.modelVersion;
+        // Adaptar el manejo de `modelVersion`
+        if (!updateModelVersion && result.training_details.modelVersion) {
+            delete result.training_details.modelVersion;
         }
 
+        // Preparar datos para guardar la sesión de entrenamiento en la base de datos
         const trainingSessionData = {
             user_id: userId,
-            timestamp: new Date().toISOString(),
-            duration: result.duration || 0,
+            timestamp: result.training_details.timestamp || new Date().toISOString(),
+            duration: result.training_details.duration || 0,
             status: result.status || 'unknown',
-            accuracy: result.accuracy,
-            f1_score: result.f1_score,
-            precision: result.precision,
-            recall: result.recall,
+            accuracy: result.metrics.accuracy,
+            f1_score: result.metrics.f1_score,
+            precision: result.metrics.precision,
+            recall: result.metrics.recall,
             confusion_matrix: JSON.stringify(result.confusion_matrix),
             training_data_file: trainingDataFile,
-            error_message: result.error_message || null,
+            error_message: result.message || null,
             updateModelVersion: updateModelVersion // Incluir updateModelVersion en los datos para guardar
         };
 
@@ -85,7 +87,6 @@ async function trainModel(req, res) {
         } else {
             console.log("No se llamará a handleModelVersionUpdate porque updateModelVersion es:", updateModelVersion);
         }
-        
 
         res.status(200).json(result);
 
@@ -95,33 +96,10 @@ async function trainModel(req, res) {
     }
 }
 
-async function predictModel(req, res) {
-    try {
-        let result;
-        const modelUrl = `${process.env.ML_MODEL_URL}/predict`; // Utilizar la URL del modelo desde el archivo .env
-
-        if (req.file) {
-            const filePath = path.join(__dirname, '../uploads', req.file.filename);
-            const updateModelVersion = req.body.updateModelVersion === 'true';
-            const data = await mlModelService.convertTsvToJson(filePath);
-            data.updateModelVersion = updateModelVersion;
-            result = await mlModelService.predictModel(data, modelUrl);
-        } else {
-            const data = req.body;
-            result = await mlModelService.predictModel(data, modelUrl);
-        }
-
-        res.status(200).json(result);
-    } catch (error) {
-        console.error('Error en predictModel:', error);
-        res.status(500).json({ error: 'Error haciendo predicción.', details: error.message });
-    }
-}
-
 async function handleModelVersionUpdate(result, trainingDataFile) {
     try {
         // Obtener el número de registros usados en el entrenamiento
-        const dataSize = result.modelVersion.data_size;
+        const dataSize = result.training_details.data_size || null;
 
         // Consultar la versión actual del modelo
         const [rows] = await db.promise().query('SELECT * FROM model_versions ORDER BY version_id DESC LIMIT 1');
@@ -146,10 +124,10 @@ async function handleModelVersionUpdate(result, trainingDataFile) {
             ) VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
 
-        const modelType = result.modelVersion.model_type;
-        const bestK = result.modelVersion.best_k;
-        const modelPath = result.modelVersion.model_path;
-        const createdAt = result.modelVersion.timestamp;
+        const modelType = result.training_details.model_type || 'unknown';
+        const bestK = result.training_details.best_k || null;
+        const modelPath = result.training_details.model_path || 'path/to/default_model';
+        const createdAt = result.training_details.timestamp;
 
         await db.promise().query(insertQuery, [
             modelType,            // model_type
@@ -165,6 +143,29 @@ async function handleModelVersionUpdate(result, trainingDataFile) {
     } catch (error) {
         console.error('Error al actualizar la versión del modelo:', error);
         throw error;
+    }
+}
+
+async function predictModel(req, res) {
+    try {
+        let result;
+        const modelUrl = `${process.env.ML_MODEL_URL}/predict`; // Utilizar la URL del modelo desde el archivo .env
+
+        if (req.file) {
+            const filePath = path.join(__dirname, '../uploads', req.file.filename);
+            const updateModelVersion = req.body.updateModelVersion === 'true';
+            const data = await mlModelService.convertTsvToJson(filePath);
+            data.updateModelVersion = updateModelVersion;
+            result = await mlModelService.predictModel(data, modelUrl);
+        } else {
+            const data = req.body;
+            result = await mlModelService.predictModel(data, modelUrl);
+        }
+
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error en predictModel:', error);
+        res.status(500).json({ error: 'Error haciendo predicción.', details: error.message });
     }
 }
 
